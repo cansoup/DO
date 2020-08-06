@@ -56,7 +56,7 @@ import axios from 'axios'
 import User from '../models/user'
 
 const storage = window.sessionStorage
-const API_URL = 'http://localhost:8399/'
+const API_URL = 'http://localhost:8081/'
 
 export default {
   name: 'login',
@@ -102,11 +102,11 @@ export default {
           .catch(err => console.log(err))
       }
     },
-    logout() {
-      storage.setItem("jwt-auth-token", "")
-      storage.setItem("login_user", "")
-      this.message = "로그인해주세요."
-    },
+    // logout() {
+    //   storage.setItem("jwt-auth-token", "")
+    //   storage.setItem("login_user", "")
+    //   this.message = "로그인해주세요."
+    // },
     
     // 로그인 했는지 체크
     init() {
