@@ -40,7 +40,7 @@ export default new Vuex.Store({
     // login(state) {
     //   state.pending = true;
     // },
-    // logout (state) {
+    // logout(state) {
     //   state.isLoggedIn = false;
     // }
   },
@@ -58,7 +58,9 @@ export default new Vuex.Store({
       )
     },
     logout({commit}) {
-      console.log(typeof(isLoggedIn))
+      console.log(this.state)
+      this.state["isLoggedIn"] = false
+      // console.log(typeof(isLoggedIn))
       AuthService.logout()
       commit('logout')
     },
