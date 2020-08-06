@@ -36,6 +36,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'Navbar',
   data() {
@@ -51,7 +52,7 @@ export default {
     onClickLogout() {
       // LOGOUT 변이 실행 후 리다이렉트
       this.$store.dispatch('logout')
-      this.isLogin = this.$store.getters.isAuthenticated
+        .then(() => this.$router.push('/'))
     },
     loginChecker() {
       this.$store.commit('logincheck')
@@ -67,16 +68,9 @@ export default {
   created() {
     this.loginChecker()
   },
-  // computed() {
-  //   this.loginChecker()
-  // }
-  // watch: {
-  //   isLogin (val, prev) {
-  //     if (val !== prev) {
-  //       val = this.$store.getters.isAuthenticated
-  //     }
-  //   }
-  // }
+  mounted() {
+    this.loginChecker()
+  }
 }
 </script>
 
