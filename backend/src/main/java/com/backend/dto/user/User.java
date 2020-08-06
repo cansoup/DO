@@ -19,5 +19,6 @@ public class User {
     private String instagram;      // instagram 주소
     private String github;         // github 주소
     private String introduce;      // 프로필 소개
+    private String isSocialLogin;  // Social Login User이면 값 존재, 아니면 NULL
 
 }

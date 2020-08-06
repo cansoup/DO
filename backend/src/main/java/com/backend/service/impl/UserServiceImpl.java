@@ -50,4 +50,9 @@ public class UserServiceImpl implements UserService{
         }
     }
 
+    @Override
+    public String isSocialUser(String email, String password) {
+        return dao.isSocialUser(email, password);
+    }
+
 }

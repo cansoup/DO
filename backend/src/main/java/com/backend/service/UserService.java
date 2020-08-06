@@ -11,5 +11,5 @@ public interface UserService{
     public void update(User c); // 회원 정보 수정
 
     public User signin(String email, String password);
-
+    public String isSocialUser(String email, String password);
 }

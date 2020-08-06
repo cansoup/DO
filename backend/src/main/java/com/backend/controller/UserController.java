@@ -28,27 +28,39 @@ public class UserController {
     @Autowired
     private JwtService jwtService;
 
+
+
     @PostMapping("/api/signin")
     public ResponseEntity<Map<String, Object>> signin(@RequestBody User user, HttpServletResponse res){
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = null;
 
         try{
-
-            User loginUser = service.signin(user.getEmail(), user.getPassword());
-
-            // 이메일로 uid 가져오기.
+            String SocialUser = service.isSocialUser(user.getEmail(), user.getPassword());
+            if(SocialUser != null){
+                System.out.println("socialLogin: True");
+                status = HttpStatus.ACCEPTED;
+                resultMap.put("isSocialLogin", SocialUser);
+            }else{
+                System.out.println("socialLogin: False");
+                User loginUser = service.signin(user.getEmail(), user.getPassword());
+                // 이메일로 uid 가져오기.
 //            User user2 = service.findByEmail(user.getEmail());
 //            System.out.println("user2:"+user2);
 
-            // 로그인 성공했다면 토큰을 생성한다.
-            String token = jwtService.create(loginUser);
-            // 토큰 정보는 request의 헤더로 보내고 나머지는 Map에 담아둔다.
+                // 로그인 성공했다면 토큰을 생성한다.
+                String token = jwtService.create(loginUser);
+                // 토큰 정보는 request의 헤더로 보내고 나머지는 Map에 담아둔다.
 //            res.setHeader("jwt-auth-token", token);
-            resultMap.put("jwt-auth-token", token);
-            resultMap.put("status", true);
-            resultMap.put("request_body", loginUser);
-            status = HttpStatus.ACCEPTED;
+                resultMap.put("jwt-auth-token", token);
+                resultMap.put("status", true);
+                resultMap.put("request_body", loginUser);
+                status = HttpStatus.ACCEPTED;
+            }
+
+
+
+
         } catch(RuntimeException e){
             log.error("정보조회 실패", e);
             resultMap.put("message", e.getMessage());

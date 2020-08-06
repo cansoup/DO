@@ -43,4 +43,10 @@ public class UserDaoImpl implements UserDao {
         return mapper.signin(email, password);
     }
 
+    @Override
+    public String isSocialUser(String email, String password) {
+        return mapper.isSocialUser(email, password);
+    }
+
+
 }
