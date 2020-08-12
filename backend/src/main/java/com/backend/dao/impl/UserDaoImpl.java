@@ -34,8 +34,23 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void update(User c) {
-        mapper.update(c);
+    public void updateProfileImage(String email, String profileImage) {
+        mapper.updateProfileImage(email, profileImage);
+    }
+
+    @Override
+    public void updateIntroduce(String email, String nickname, String introduce) {
+        mapper.updateIntroduce(email, nickname, introduce);
+    }
+
+    @Override
+    public void updateSNS(String email, String facebook, String github, String instagram) {
+        mapper.updateSNS(email, facebook, github, instagram);
+    }
+
+    @Override
+    public void updateQR(String email, String qrImage) {
+        mapper.updateQR(email, qrImage);
     }
 
     @Override

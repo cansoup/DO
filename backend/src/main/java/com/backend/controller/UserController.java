@@ -4,7 +4,6 @@ import com.backend.service.JWTDecoding;
 import com.backend.service.JwtService;
 import com.backend.service.UserService;
 import com.backend.dto.user.User;
-import io.jsonwebtoken.Jwt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -160,6 +159,8 @@ public class UserController {
     // 실패 >> return null
     @GetMapping("/api/v1/{uid}")
     public Optional<User> findbyUid(@PathVariable String uid){
+        System.out.println("UID : "+ uid);
+        System.out.println("FindbyUid : "+service.findByUid(uid));
         return Optional.ofNullable(service.findByUid(uid));
     }
 
@@ -181,10 +182,26 @@ public class UserController {
     // 회원정보수정
     // 회원정보수정 성공 >> return "회원수정 성공"
     // 실패 >> return ERROR MSG
-    @PutMapping(value="/api/v1")
+    @PutMapping(value="/api/v1/{uid}")
     public ResponseEntity<?> update(@RequestBody User user) {
         try{
-            service.update(user);
+
+            switch(user.getUpdateType()){
+                // modifyType:1 프로필 img
+                case "1":  service.updateProfileImage(user.getEmail(), user.getProfileImage());
+                    break;
+                // modifyType:2 nickname, introduce
+                case "2": service.updateIntroduce(user.getEmail(), user.getNickname(), user.getIntroduce());
+                    break;
+                // modifyType:3 SNS Info
+                case "3":service.updateSNS(user.getEmail(), user.getFacebook(), user.getGithub(), user.getInstagram());
+                    break;
+                // modifyType:4 QR Upload
+                case "4": service.updateQR(user.getEmail(), user.getQrImage());
+                    break;
+
+            }
+
             return new ResponseEntity<>("회원정보수정 성공", HttpStatus.OK);
         }catch(Exception err){
             String errorMessage;
