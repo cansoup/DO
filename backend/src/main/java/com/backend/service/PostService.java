@@ -28,7 +28,7 @@ public interface PostService {
 
     public void delete(Long pid); // 게시글 삭제
 
-    public void onClickLikes(Long pid, boolean status); // 좋아요 버튼을 눌렀을 경우
+    public void onClickLikes(Long pid, Long uid, boolean status); // 좋아요 버튼을 눌렀을 경우
 
     public List<String> findAllPostTags(Long pid); // 포스트에 등록된 태그 정보를 가져온다.
 

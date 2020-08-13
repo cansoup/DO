@@ -1,18 +1,23 @@
 package com.backend.controller;
 
 import com.backend.dto.post.Post;
+import com.backend.service.BookmarkService;
 import com.backend.service.CommentService;
 import com.backend.service.PostService;
+import com.backend.util.SHA512;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.jdbc.SQL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.SQLException;
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Api(tags = {"Post"})
@@ -26,13 +31,15 @@ public class PostController {
     @Autowired
     CommentService commentService;
 
+    @Autowired
+    BookmarkService bookmarkService;
+
     /**
      * @param newPost : 사용자가 작성한 Post
-     * @param uid     : 사용자 아이디
      * @return 글이 정상적으로 등록된 경우 HttpStatus 201 반환
      */
     @ApiOperation(value = "글 작성", notes = "새로운 포스트를 작성한다.")
-    @PostMapping("/api/v2/{uid}")
+    @PostMapping("/api/v2/")
     public HttpStatus save(@RequestBody Post newPost) throws Exception {
         try {
             postService.save(newPost);
@@ -50,8 +57,9 @@ public class PostController {
     @GetMapping("/api/v2/p/{pid}")
     public Post findById(@PathVariable Long pid) {
         Post post = postService.findById(pid);
-        post.setTag(postService.findAllPostTags(pid));
-        post.setComments(commentService.findAllCommentsInPost(pid));
+        post.setTag(postService.findAllPostTags(pid)); // 게시글의 모든 태그를 불러옴
+        post.setComments(commentService.findAllCommentsInPost(pid)); // 게시글의 모든 댓글을 불러옴
+        post.setIsLike(bookmarkService.isBookmark(post.getUid(), post.getPid()) != null ? true : false);
         return post;
     }
 
@@ -109,13 +117,18 @@ public class PostController {
     }
 
     /**
-     * @param pid    : 포스트의 pid
-     * @param status : 좋아요 토글 상태값 true : 좋아요 활성 false : 좋아요 비활성
+     * pid, uid, status 값을 JSON 형태로 전달받음
+     * status = True : 좋아요 활성화 및 북마크 등록
+     * status = False : 좋아요 비활성화 및 북마크 삭제
      */
     @ApiOperation(value = "좋아요 이벤트 처리", notes = "좋아요를 누른 게시물과 토글 상태값을 넘겨받는다")
-    @PutMapping("/api/v2/likes/{pid}/{status}")
-    public void updateLikes(@PathVariable Long pid, @PathVariable boolean status) {
-        postService.onClickLikes(pid, status);
+    @PutMapping("/api/v2/likes")
+    public void updateLikes(@RequestBody Map<String, String> likes) {
+        Long pid = Long.parseLong(likes.get("pid"));
+        Long uid = Long.parseLong(likes.get("uid"));
+        Boolean status = Boolean.parseBoolean(likes.get("status"));
+
+        postService.onClickLikes(pid, uid, status);
     }
 
     /**
@@ -157,5 +170,41 @@ public class PostController {
     @PutMapping("/api/v2")
     public void update(Post post) {
         postService.update(post);
+    }
+
+    // 글 읽어올 때 좋아요 표시한 게시물인지 판단해서 좋아요 활성 비활성 하는 것 해야함
+
+    /**
+     *
+     * @param file
+     * @param title
+     * @param author
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value = "섬네일 이미지 업로드", notes = "섬네일 이미지 업로드, 파일, 게시글 제목, 작성자")
+    @PostMapping(value = "/api/v2/img")
+    public String uploadThumbnailImages(@RequestParam("file") MultipartFile file, @RequestParam("title") String title,
+                                        @RequestParam("author") String author) throws Exception {
+
+        String fullFileName = file.getOriginalFilename(); // 파일명 + 확장자
+        String originFileName = fullFileName.substring(0, fullFileName.indexOf('.')); // 순수 파일명 확장자 제거
+        String extension = fullFileName.substring(fullFileName.indexOf('.')); // 파일 확장자
+
+        SHA512 filename = new SHA512(originFileName); // 파일명 SHA-512 암호화
+        SHA512 sha512Title = new SHA512(title);
+        String basePath = "/home/ubuntu/dist/dist/img/" + author + "/" + sha512Title.getSha512(); // 루트경로 + 사용자 이메일 + 글 제목
+
+        File dir = new File(basePath); // 경로에 디렉토리가 존재하지 않을 경우 폴더 생성
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String filePath = basePath + "/" + filename.getSha512() + extension;
+        System.out.println(filePath);
+        File location = new File(filePath);
+        file.transferTo(location);
+        String url = filePath.replace("/home/ubuntu/dist/dist/", "i3a507.p.ssafy.io/");
+        return url;
     }
 }

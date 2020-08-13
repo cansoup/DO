@@ -30,4 +30,6 @@ public class Post {
     private String category;        // 글 카테고리
     private List<String> tag;       // 글에 적용된 태그
     private List<Comment> comments; // 글에 작성된 모든 댓글
+
+    private Boolean isLike;         // 좋아요 체크 여부
 }

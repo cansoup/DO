@@ -3,6 +3,7 @@ package com.backend.service.impl;
 import com.backend.dao.PostDao;
 import com.backend.dto.post.Post;
 import com.backend.dto.post.Tag;
+import com.backend.service.BookmarkService;
 import com.backend.service.PostService;
 import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     PostDao postDao;
 
+    @Autowired
+    BookmarkService bookmarkService;
+
     @Override
     public Long save(Post post) {
 
@@ -28,13 +32,13 @@ public class PostServiceImpl implements PostService {
         for(String tag : post.getTag()) {
             Long tid = postDao.findTagByName(tag);
             if(tid != null) { // 태그가 이미 존재하는 경우
-                postDao.increaseTagHits(tag);
+                postDao.increaseTagHits(tag); // 해당 태그의 사용 횟수를 1증가
             } else {
                 Tag newTag = new Tag(tag);
-                postDao.saveNewTag(newTag);
+                postDao.saveNewTag(newTag); // 새로운 태그를 등록한 뒤에
                 tid = newTag.getTid();
             } // 태그가 존재하지 않는 경우
-            postDao.savePostTagList(pid, tid);
+            postDao.savePostTagList(pid, tid); // 태그 리스트에 저장
         }
         return 1L;
     }
@@ -87,13 +91,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void onClickLikes(Long pid, boolean status) {
+    public void onClickLikes(Long pid, Long uid, boolean status) {
         if(status) {// 좋아요 활성화
             postDao.increaseLikes(pid);
+            bookmarkService.saveBookmark(uid, pid);
             // 사용자의 즐겨찾기 목록에 등록
         } else { // 좋아요 비활성화
             postDao.decreaseLikes(pid);
             // 사용자의 즐겨찾기 목록에서 삭제
+            bookmarkService.deleteBookmark(uid, pid);
         }
     }
 

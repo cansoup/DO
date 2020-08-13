@@ -21,4 +21,17 @@
     <select id="findAllChildComment" resultType="com.backend.dto.comment.Comment">
         select * from comment where parent = #{cid}
     </select>
+
+    <!-- 댓글 삭제 -->
+    <delete id="delete">
+        delete from comment where cid = #{cid}
+    </delete>
+
+
+    <!-- 댓글 수정 -->
+    <update id="update">
+        update from comment
+        set content = #{content}
+        where cid = #{cid}
+    </update>
 </mapper>

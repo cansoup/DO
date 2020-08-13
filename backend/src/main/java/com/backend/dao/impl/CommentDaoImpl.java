@@ -25,6 +25,16 @@ public class CommentDaoImpl implements CommentDao {
     }
 
     @Override
+    public void update(Comment comment) {
+        commentMapper.update(comment);
+    }
+
+    @Override
+    public void delete(Long cid) {
+        commentMapper.delete(cid);
+    }
+
+    @Override
     public List<Comment> findAllChildComment(Long cid) {
         return commentMapper.findAllChildComment(cid);
     }

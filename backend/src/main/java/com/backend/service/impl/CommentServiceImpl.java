@@ -26,6 +26,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public void update(Comment comment) {
+        commentDao.update(comment);
+    }
+
+    @Override
+    public void delete(Long cid) {
+        commentDao.delete(cid);
+    }
+
+    @Override
     public List<Comment> findAllCommentsInPost(Long pid) { // 글에 해당하는 모든 댓글을 조회
         List<Comment> commentList = commentDao.findAllComment(pid);
         for(Comment comment : commentList) { // 해당 댓글들의 대댓글을 조회
