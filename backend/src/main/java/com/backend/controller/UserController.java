@@ -248,7 +248,8 @@ public class UserController {
     @PostMapping(value = "/api/v1/img")
     public String uploadThumbnailImages(@RequestParam("file") MultipartFile file,
                                         @RequestParam("nickname") String nickname) throws Exception {
-
+        System.out.println("File: "+file);
+        System.out.println("Nickname: "+nickname);
         String fullFileName = file.getOriginalFilename(); // 파일명 + 확장자
         String originFileName = fullFileName.substring(0, fullFileName.indexOf('.')); // 순수 파일명 확장자 제거
         String extension = fullFileName.substring(fullFileName.indexOf('.')); // 파일 확장자
